@@ -1,0 +1,6 @@
+{
+"from" : "neuronapue@gmail.com",
+"to" : "joshuaedi@gmail.com", 
+"subject" : "Evento de Alerta",
+"text" : "EXISTE UNA METRICA FUERA DE RANGO."
+}
