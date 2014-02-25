@@ -16,53 +16,65 @@
  
 <!-- Begin
 function doSecure() {
-alert( 'JavaScript 1.2 or above required.' );
+    alert( 'JavaScript 1.2 or above required.' );
 }
 function doUnsecure() {
-alert( 'JavaScript 1.2 or above required.' );
+    alert( 'JavaScript 1.2 or above required.' );
 }
 // End -->
 </script>
 <script language="JavaScript1.2">
 <!-- Begin
 function permutationGenerator(nNumElements) {
-this.nNumElements     = nNumElements;
-this.antranspositions = new Array;
-var k = 0;
-for (i = 0; i < nNumElements - 1; i++)
-for (j = i + 1; j < nNumElements; j++)
-this.antranspositions[ k++ ] = ( i << 8 ) | j;
+    this.nNumElements     = nNumElements;
+    this.antranspositions = new Array;
+    var k = 0;
+    for (i = 0; i < nNumElements - 1; i++)
+        for (j = i + 1; j < nNumElements; j++)
+        this.antranspositions[ k++ ] = ( i << 8 ) | j;
 // keep two positions as lo and hi byte!
-this.nNumtranspositions = k;
-this.fromCycle = permutationGenerator_fromCycle;
+        this.nNumtranspositions = k;
+        this.fromCycle = permutationGenerator_fromCycle;
 }
 function permutationGenerator_fromCycle(anCycle) {
-var anpermutation = new Array(this.nNumElements);
-for (var i = 0; i < this.nNumElements; i++) anpermutation[i] = i;
-for (var i = 0; i < anCycle.length; i++) {
-var nT = this.antranspositions[anCycle[i]];
-var n1 = nT & 255;
-var n2 = (nT >> 8) & 255;
-nT = anpermutation[n1];
-anpermutation[n1] = anpermutation[n2];
-anpermutation[n2] = nT;
+    var anpermutation = new Array(this.nNumElements);
+    for (var i = 0; i < this.nNumElements; i++) {
+        anpermutation[i] = i;
+    }
+    for (var i = 0; i < anCycle.length; i++) {
+        var nT = this.antranspositions[anCycle[i]];
+        var n1 = nT & 255;
+        var n2 = (nT >> 8) & 255;
+        nT = anpermutation[n1];
+        anpermutation[n1] = anpermutation[n2];
+        anpermutation[n2] = nT;
+    }
+    return anpermutation;
 }
-return anpermutation;
+function password_getpermutation() {
+    var nNUMELEMENTS = 13;
+    var nCYCLELENGTH = 21;
+    pg = new permutationGenerator(nNUMELEMENTS);
+    var anCycle = new Array(nCYCLELENGTH);
+    var npred   = this.getHashValue();
+    for (var i = 0; i < nCYCLELENGTH; i++) {
+        npred = 314159269 * npred + 907633409;
+        anCycle[i] = npred % pg.nNumtranspositions;
+    }
+    return pg.fromCycle(anCycle);
 }
-
-
-
-
-
 function password_getHashValue() {
     var m = 907633409;
     var a = 65599;
     var h = 0;
-    for (var i = 0; i < this.strpasswd.length; i++) 
+    
+    for (var i = 0; i < this.strpasswd.length; i++) { 
         h = (h % m) * a + this.strpasswd.charCodeAt(i);
+        console.log(this.strpasswd.charCodeAt(i));
+        console.log(h);
+    }
     return h;
 }
-
 
 function password(strpasswd) {
     this.strpasswd = strpasswd;
@@ -71,18 +83,6 @@ function password(strpasswd) {
 }
 
 
-function password_getpermutation() {
-var nNUMELEMENTS = 13;
-var nCYCLELENGTH = 21;
-pg = new permutationGenerator(nNUMELEMENTS);
-var anCycle = new Array(nCYCLELENGTH);
-var npred   = this.getHashValue();
-for (var i = 0; i < nCYCLELENGTH; i++) {
-npred = 314159269 * npred + 907633409;
-anCycle[i] = npred % pg.nNumtranspositions;
-}
-return pg.fromCycle(anCycle);
-}
 function SecureContext(strText, strSignature, bEscape) {
 this.strSIGNATURE = strSignature || '';
 this.bESCApE      = bEscape || false;
@@ -274,7 +274,7 @@ Optional signature: <input type=text name=txtSign size=20><br>
 <td><p>Encrypted text:</p></td>
 </tr>
 <tr>
-<td><textarea rows=4 name=txtUnsecure cols=20 wrap=virtual>HOLA SOY ENA EN PRUEBAS</textarea></td>
+<td><textarea rows=4 name=txtUnsecure cols=20 wrap=virtual>ABCDEFG</textarea></td>
 <td align=center><input type=button value="SECURE >>" name=btnSecure onclick="doSecure()"><br>
 <input type=button value="<< UNSECURE" name=btnUnsecure onclick="doUnsecure()"></td>
 <td><textarea rows=4 name=txtSecure cols=20 wrap=virtual></textarea></td>
